@@ -1204,6 +1204,105 @@ em { font-family: 'Instrument Serif', 'Playfair Display', serif; font-style: ita
 .legend-teal { background: var(--violet-2); }
 .legend-orange { background: var(--cyan); }
 
+/* ---------- AUTH PAGE — LIGHT AURORA AESTHETIC ---------- */
+.auth-page {
+  background: linear-gradient(135deg, #f7f5ff 0%, #eef1ff 45%, #f0f7ff 100%);
+  color: #1a1235;
+}
+.auth-page::before {
+  background:
+    radial-gradient(700px 400px at 15% 20%, rgba(147, 102, 255, 0.18), transparent 55%),
+    radial-gradient(600px 400px at 90% 80%, rgba(209, 107, 255, 0.14), transparent 55%),
+    radial-gradient(500px 320px at 60% 50%, rgba(124, 197, 255, 0.14), transparent 60%);
+}
+.auth-page .brand { color: #1a1235; }
+.auth-page .brand-light { color: #1a1235; }
+.auth-page .brand-mark { background: linear-gradient(135deg, #7d47ff, #5b2be0); color: #fff; box-shadow: 0 8px 20px rgba(147, 102, 255, 0.35); }
+
+.auth-page .auth-aside {
+  background: transparent;
+  border-right: 1px solid rgba(147, 102, 255, 0.15);
+  color: #1a1235;
+}
+.auth-page .auth-aside::after {
+  background:
+    radial-gradient(circle at 30% 35%, rgba(209, 107, 255, 0.25) 0%, transparent 45%),
+    radial-gradient(circle at 70% 60%, rgba(124, 197, 255, 0.22) 0%, transparent 45%),
+    radial-gradient(circle at 50% 45%, rgba(147, 102, 255, 0.30) 0%, transparent 55%);
+  filter: blur(10px);
+}
+.auth-page .auth-aside-copy h1 {
+  background: linear-gradient(180deg, #1a1235 15%, #5b2be0 100%);
+  -webkit-background-clip: text; background-clip: text;
+  color: transparent;
+}
+.auth-page .auth-aside-copy p { color: #5c5378; }
+.auth-page .auth-aside-bottom { color: #6e6488; }
+.auth-page .auth-aside-bottom span:first-child { color: #5b2be0; }
+.auth-page .eyebrow, .auth-page .eyebrow-light {
+  color: #5b2be0;
+  background: rgba(147, 102, 255, 0.12);
+  border-color: rgba(147, 102, 255, 0.28);
+}
+
+.auth-page .auth-main { background: transparent; }
+.auth-page .auth-card {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(147, 102, 255, 0.20);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 30px 80px rgba(45, 20, 120, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+.auth-page .auth-card-head h2 { color: #1a1235; }
+.auth-page .auth-card-head p { color: #5c5378; }
+
+.auth-page .field > span { color: #5c5378; }
+.auth-page .field input,
+.auth-page .field select,
+.auth-page .setup-state input,
+.auth-page .tester-input input {
+  background: #ffffff;
+  border: 1px solid #e0dbf1;
+  color: #1a1235;
+}
+.auth-page .field input::placeholder { color: #a89dc4; }
+.auth-page .field input:focus,
+.auth-page .field select:focus {
+  border-color: #7d47ff;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(147, 102, 255, 0.18);
+}
+.auth-page .input-icon { color: #8b83a5; }
+.auth-page .input-icon:hover { color: #1a1235; }
+
+.auth-page .checkbox-label, .auth-page .terms { color: #5c5378; }
+.auth-page .link-button { color: #5b2be0; }
+.auth-page .link-button:hover { color: #1a1235; }
+.auth-page .text-button { color: #5c5378; }
+.auth-page .auth-switch { border-top-color: rgba(147, 102, 255, 0.15); color: #5c5378; }
+
+.auth-page .form-error {
+  background: #fff0f3;
+  border: 1px solid #ffb3be;
+  color: #c0455a;
+}
+
+.auth-page .password-meter small { color: #8b83a5; }
+.auth-page .meter-bars span { background: #e6e2f2; }
+
+.auth-page .button-secondary {
+  background: rgba(147, 102, 255, 0.08);
+  color: #5b2be0;
+  border-color: rgba(147, 102, 255, 0.22);
+}
+.auth-page .button-secondary:hover { background: rgba(147, 102, 255, 0.14); }
+.auth-page .button-ghost { color: #5c5378; }
+.auth-page .button-ghost:hover { color: #1a1235; background: rgba(147, 102, 255, 0.06); }
+
+.auth-page .mobile-auth-logo .brand { color: #1a1235; }
+
+/* Auth page cursor aurora (softer for light bg) */
+.auth-page .cursor-aurora { mix-blend-mode: multiply; opacity: 0.55; }
+
 /* ---------- LIGHT MODE (opt-in via body.light) ---------- */
 body.light {
   --bg: #f6f9fc;
