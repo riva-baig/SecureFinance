@@ -1072,6 +1072,138 @@ em { font-family: 'Instrument Serif', 'Playfair Display', serif; font-style: ita
 .setting-row p { color: var(--ink-soft); font-size: 11px; margin: 0; }
 .setting-status { color: var(--green); font-size: 11px; font-weight: 500; }
 
+/* ---------- AURORA ENHANCEMENTS ---------- */
+.cursor-aurora {
+  position: fixed;
+  top: 0; left: 0;
+  width: 480px; height: 480px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+  mix-blend-mode: screen;
+  transform: translate(-50%, -50%);
+  will-change: transform;
+}
+.cursor-aurora-1 {
+  background: radial-gradient(circle, rgba(147, 102, 255, 0.28) 0%, rgba(147, 102, 255, 0.10) 30%, transparent 60%);
+  filter: blur(30px);
+}
+.cursor-aurora-2 {
+  width: 260px; height: 260px;
+  background: radial-gradient(circle, rgba(209, 107, 255, 0.22) 0%, rgba(124, 197, 255, 0.14) 45%, transparent 65%);
+  filter: blur(20px);
+}
+@media (hover: none), (max-width: 900px) { .cursor-aurora { display: none; } }
+
+.preview-chart-wrap { margin: 8px -6px 0; position: relative; }
+.preview-chart-wrap svg { display: block; overflow: visible; }
+
+.profile-actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.button-danger {
+  background: rgba(255, 122, 140, 0.08);
+  border: 1px solid rgba(255, 122, 140, 0.30);
+  color: #ffb3be;
+}
+.button-danger:hover { background: rgba(255, 122, 140, 0.15); color: #fff; border-color: rgba(255, 122, 140, 0.50); }
+
+/* Aurora hero orb — layered violet + magenta + cyan */
+.hero-orb {
+  background:
+    radial-gradient(circle at 30% 40%, rgba(209, 107, 255, 0.45) 0%, transparent 40%),
+    radial-gradient(circle at 70% 55%, rgba(124, 197, 255, 0.35) 0%, transparent 42%),
+    radial-gradient(circle at 50% 40%, rgba(147, 102, 255, 0.60) 0%, rgba(91, 43, 224, 0.35) 25%, rgba(30, 15, 60, 0.75) 45%, transparent 60%);
+}
+.hero-orb::after {
+  background: radial-gradient(ellipse at 50% 0%, rgba(209, 107, 255, 0.35) 0%, rgba(124, 197, 255, 0.30) 40%, transparent 65%);
+}
+
+/* Landing::before layered aurora glows */
+.landing-page::before {
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(147, 102, 255, 0.18), transparent 60%),
+    radial-gradient(900px 500px at 100% 100%, rgba(124, 197, 255, 0.14), transparent 60%),
+    radial-gradient(800px 450px at 0% 80%, rgba(209, 107, 255, 0.10), transparent 60%);
+}
+
+/* Aurora CTA button — multi-hue gradient */
+.button-primary {
+  background: linear-gradient(120deg, #6a37ec 0%, #9366ff 45%, #d16bff 100%);
+  background-size: 200% 100%;
+  background-position: 0% 50%;
+  transition: transform .25s cubic-bezier(.2,.7,.2,1), background-position .5s, box-shadow .25s;
+}
+.button-primary:hover { background-position: 100% 50%; background-image: linear-gradient(120deg, #6a37ec 0%, #9366ff 45%, #d16bff 100%); }
+
+/* Nav pill — subtle aurora edge when active */
+.nav-pill a.active {
+  background: linear-gradient(90deg, rgba(147, 102, 255, 0.16), rgba(124, 197, 255, 0.10));
+}
+
+/* Sidebar active — aurora accent */
+.side-nav a.active {
+  background: linear-gradient(90deg, rgba(147, 102, 255, 0.22) 0%, rgba(124, 197, 255, 0.08) 100%);
+  box-shadow: inset 0 0 0 1px rgba(147, 102, 255, 0.28), inset 3px 0 0 0 var(--violet-2);
+}
+
+/* Stat card left-edge aurora stripes for each variant */
+.stat-card { position: relative; overflow: hidden; }
+.stat-card::before {
+  content: ""; position: absolute; top: 0; left: 0; bottom: 0; width: 3px;
+  background: linear-gradient(180deg, var(--violet-2), var(--magenta));
+  opacity: 0.7;
+}
+.stat-green::before { background: linear-gradient(180deg, var(--green), var(--teal)); }
+.stat-orange::before { background: linear-gradient(180deg, var(--amber), var(--magenta)); }
+.stat-blue::before { background: linear-gradient(180deg, var(--cyan), var(--violet-2)); }
+.stat-dark::before { background: linear-gradient(180deg, var(--teal), var(--cyan)); }
+
+/* Dashboard aurora backdrop (app-shell) — three-hue */
+.app-shell::before {
+  background:
+    radial-gradient(1000px 600px at 100% 0%, rgba(147, 102, 255, 0.14), transparent 55%),
+    radial-gradient(900px 500px at 0% 100%, rgba(124, 197, 255, 0.10), transparent 55%),
+    radial-gradient(700px 400px at 60% 100%, rgba(209, 107, 255, 0.08), transparent 60%);
+}
+
+/* Panel head titles — subtle aurora underline on hover of the panel */
+.panel { position: relative; }
+.panel-head h2 { background: linear-gradient(90deg, var(--ink) 0%, var(--ink) 100%); -webkit-background-clip: text; background-clip: text; }
+
+/* Auth aside — layered aurora */
+.auth-aside::after {
+  background:
+    radial-gradient(circle at 30% 35%, rgba(209, 107, 255, 0.35) 0%, transparent 40%),
+    radial-gradient(circle at 70% 55%, rgba(124, 197, 255, 0.30) 0%, transparent 42%),
+    radial-gradient(circle at 50% 40%, rgba(147, 102, 255, 0.60) 0%, rgba(91, 43, 224, 0.35) 25%, transparent 55%);
+}
+
+/* Feature card hover — aurora edge */
+.feature-card::after {
+  content: ""; position: absolute; inset: 0;
+  border-radius: 16px;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(147, 102, 255, 0.35), rgba(124, 197, 255, 0.10) 45%, rgba(209, 107, 255, 0.28));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  opacity: 0; transition: opacity .35s;
+  pointer-events: none;
+}
+.feature-card:hover::after { opacity: 1; }
+
+/* Range tab active — aurora tint */
+.range-tabs button.active { background: linear-gradient(90deg, rgba(147, 102, 255, 0.20), rgba(124, 197, 255, 0.12)); }
+
+/* Security score ring — aurora conic */
+.score-ring { background: conic-gradient(from 180deg, var(--cyan) 0deg, var(--violet-2) calc(var(--score) * 0.5), var(--magenta) var(--score), rgba(147, 102, 255, 0.10) 0); }
+
+/* Category dots — aurora sequence */
+.cat-dot { background: var(--violet-2); }
+.cat-1 { background: var(--cyan); }
+.cat-2 { background: var(--magenta); }
+.cat-3 { background: var(--amber); }
+.legend-teal { background: var(--violet-2); }
+.legend-orange { background: var(--cyan); }
+
 /* ---------- LIGHT MODE (opt-in via body.light) ---------- */
 body.light {
   --bg: #f6f9fc;

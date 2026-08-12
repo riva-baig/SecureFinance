@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, useRef, createContext, useContext } from "react";
 import { BrowserRouter, Routes, Route, NavLink, Navigate, useNavigate, useLocation, Link } from "react-router-dom";
 import axios from "axios";
-import { motion, useInView, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { motion, useInView, useMotionValue, useSpring, useTransform, useScroll } from "framer-motion";
 import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { ArrowUpRight, BarChart3, Bell, BookOpen, Check, ChevronRight, CircleDollarSign, CreditCard, Eye, EyeOff, FileText, Gift, Globe2, Home, Landmark, LayoutDashboard, LogOut, Menu, Moon, MoreHorizontal, Pencil, Plus, Receipt, Search, Settings, Shield, ShieldCheck, Sparkles, Sun, Target, Trash2, TrendingUp, UserRound, Wallet, X, LockKeyhole, Zap } from "lucide-react";
 import { Toaster, toast } from "sonner";
@@ -36,6 +36,25 @@ function RevealOnScroll({ children, delay = 0 }) {
   return <motion.div ref={ref} initial={{ opacity: 0, y: 30 }} animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ delay, duration: 0.7, ease: [0.2, 0.7, 0.2, 1] }}>{children}</motion.div>;
 }
 
+function CursorTrail() {
+  const x = useMotionValue(-200); const y = useMotionValue(-200);
+  const sx = useSpring(x, { stiffness: 140, damping: 22, mass: 0.6 });
+  const sy = useSpring(y, { stiffness: 140, damping: 22, mass: 0.6 });
+  const sx2 = useSpring(x, { stiffness: 60, damping: 18, mass: 1 });
+  const sy2 = useSpring(y, { stiffness: 60, damping: 18, mass: 1 });
+  useEffect(() => {
+    const handler = (e) => { x.set(e.clientX); y.set(e.clientY); };
+    const leave = () => { x.set(-500); y.set(-500); };
+    window.addEventListener("mousemove", handler);
+    window.addEventListener("mouseleave", leave);
+    return () => { window.removeEventListener("mousemove", handler); window.removeEventListener("mouseleave", leave); };
+  }, [x, y]);
+  return <>
+    <motion.div className="cursor-aurora cursor-aurora-1" style={{ x: sx2, y: sy2 }} aria-hidden />
+    <motion.div className="cursor-aurora cursor-aurora-2" style={{ x: sx, y: sy }} aria-hidden />
+  </>;
+}
+
 function useMouseParallax(strength = 20) {
   const x = useMotionValue(0); const y = useMotionValue(0);
   const sx = useSpring(x, { stiffness: 60, damping: 20 }); const sy = useSpring(y, { stiffness: 60, damping: 20 });
@@ -58,6 +77,7 @@ function Landing() {
   ];
   const parallax = useMouseParallax(14);
   return <div className="landing-page">
+    <CursorTrail />
     <motion.nav className="landing-nav" initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
       <Logo />
       <div className="landing-links nav-pill">
@@ -194,8 +214,33 @@ function Landing() {
   </div>;
 }
 
+function ScrollLinkedChart() {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 85%", "end 20%"] });
+  const pathLength = useSpring(scrollYProgress, { stiffness: 80, damping: 20, mass: 0.5 });
+  const areaOpacity = useTransform(scrollYProgress, [0, 0.6, 1], [0, 0.6, 1]);
+  // Points shaped like fintech growth curve, viewBox 0-500 x 0-130
+  const linePath = "M 10 100 C 60 90, 100 82, 140 78 S 220 62, 260 58 S 340 40, 380 32 S 460 18, 490 12";
+  const areaPath = linePath + " L 490 128 L 10 128 Z";
+  return <div className="preview-chart" ref={ref}>
+    <svg viewBox="0 0 500 130" width="100%" height="130" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="auroraLine" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#7cc5ff" />
+          <stop offset="45%" stopColor="#b892ff" />
+          <stop offset="100%" stopColor="#d16bff" />
+        </linearGradient>
+        <linearGradient id="auroraFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#9366ff" stopOpacity="0.55" />
+          <stop offset="100%" stopColor="#9366ff" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <motion.path d={areaPath} fill="url(#auroraFill)" style={{ opacity: areaOpacity }} />
+      <motion.path d={linePath} fill="none" stroke="url(#auroraLine)" strokeWidth="2.5" strokeLinecap="round" style={{ pathLength }} />
+    </svg>
+  </div>;
+}
 function DashboardPreview({ parallax }) {
-  const miniData = [{ x: "May", v: 34 }, { x: "Jun", v: 42 }, { x: "Jul", v: 38 }, { x: "Aug", v: 60 }, { x: "Sep", v: 52 }, { x: "Oct", v: 74 }];
   return <motion.div className="preview-wrap" initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.9, ease: [0.2, 0.7, 0.2, 1] }}>
     <div className="preview-glow" />
     <motion.div className="float-widget fw-left-top" style={{ x: parallax?.x, y: parallax?.y }} animate={{ y: [0, -8, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}>
@@ -218,15 +263,8 @@ function DashboardPreview({ parallax }) {
         <strong>₹1,84,620</strong>
         <small><span>+12.4%</span> this month</small>
       </div>
-      <div className="preview-chart">
-        <ResponsiveContainer width="100%" height={130}>
-          <AreaChart data={miniData}>
-            <defs><linearGradient id="miniGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#9366ff" stopOpacity={0.55} /><stop offset="100%" stopColor="#9366ff" stopOpacity={0} /></linearGradient></defs>
-            <Area type="monotone" dataKey="v" stroke="#b892ff" strokeWidth={2.5} fill="url(#miniGradient)" />
-            <XAxis dataKey="x" hide /><YAxis hide />
-            <Tooltip contentStyle={{ display: "none" }} />
-          </AreaChart>
-        </ResponsiveContainer>
+      <div className="preview-chart-wrap">
+        <ScrollLinkedChart />
       </div>
       <div className="preview-foot">
         <div><span>Income</span><strong>₹92,000</strong></div>
@@ -286,7 +324,7 @@ function Analytics() { const [data, setData] = useState(null); useEffect(() => {
 function SecurityCenter() { const { user, setUser } = useAuth(); const [events, setEvents] = useState([]); const [setup, setSetup] = useState(null); const [code, setCode] = useState(""); useEffect(() => { api.get("/security/events").then((r) => setEvents(r.data)); }, []); const begin2fa = async () => { const r = await api.post("/auth/2fa/setup"); setSetup(r.data); }; const verify = async () => { try { await api.post("/auth/2fa/verify", { code }); toast.success("Two-factor authentication enabled"); setUser({ ...user, two_factor_enabled: true }); setSetup(null); } catch (e) { toast.error(formatApiError(e.response?.data?.detail)); } }; const disable = async () => { await api.post("/auth/2fa/disable"); setUser({ ...user, two_factor_enabled: false }); toast.success("Two-factor authentication disabled"); }; return <><PageHeader eyebrow="Account protection" title="Security center" text="See how your account is protected and what to strengthen next." /><div className="security-overview"><section className="panel big-score-panel"><div className="score-ring large" style={{ "--score": `${user.two_factor_enabled ? 316 : 274}deg` }}><strong>{user.two_factor_enabled ? 88 : 76}</strong><span>/100</span></div><div><div className="eyebrow">Overall security score</div><h2>{user.two_factor_enabled ? "Strong foundation." : "Good, with room to grow."}</h2><p>{user.two_factor_enabled ? "Two-factor authentication is active on this account." : "Enable two-factor authentication to add another layer of protection."}</p></div></section><section className="panel checklist-panel"><div className="panel-head"><div><h2>Security checklist</h2><span>Based on your account settings</span></div><ShieldCheck className="teal-icon" /></div><CheckItem label="Password protection" value="Active" good /><CheckItem label="Protected sessions" value="Active" good /><CheckItem label="Two-factor authentication" value={user.two_factor_enabled ? "Enabled" : "Needs attention"} good={user.two_factor_enabled} /><CheckItem label="Suspicious activity" value="No recent flags" good /></section></div><div className="security-columns"><section className="panel password-panel"><div className="panel-head"><div><h2>Password security</h2><span>Test a password locally — it never leaves this browser.</span></div><LockKeyhole size={18} /></div><PasswordTester /></section><section className="panel twofa-panel"><div className="panel-head"><div><h2>Two-factor authentication</h2><span>Add an authenticator app challenge at login.</span></div><Shield size={19} /></div>{user.two_factor_enabled ? <div className="enabled-state"><div className="success-icon"><Check size={17} /></div><strong>Authenticator protection is on</strong><p>Your next sign-in will require a current code.</p><button className="button button-secondary" onClick={disable} data-testid="disable-2fa-button">Disable 2FA</button></div> : setup ? <div className="setup-state"><strong>1. Add this secret to your authenticator</strong><code data-testid="two-factor-secret">{setup.secret}</code><strong>2. Enter the six-digit code</strong><input value={code} onChange={(e) => setCode(e.target.value)} placeholder="123456" data-testid="two-factor-verify-input" /><button className="button button-primary" onClick={verify} data-testid="verify-2fa-button">Verify and enable</button></div> : <div className="setup-state"><div className="twofa-illustration"><ShieldCheck size={28} /></div><strong>Protect sign-ins with an extra step</strong><p>Use any authenticator app. Setup is completed securely from this device.</p><button className="button button-primary" onClick={begin2fa} data-testid="enable-2fa-button">Set up 2FA <ArrowUpRight size={15} /></button></div>}</section></div><section className="panel activity-panel"><div className="panel-head"><div><h2>Security activity</h2><span>Recent sign-ins and account events</span></div><Globe2 size={18} /></div>{events.length ? events.map((e) => <div className="activity-row" key={e.id} data-testid={`security-event-${e.id}`}><span className="activity-icon"><ShieldCheck size={15} /></span><div><strong>{e.event}</strong><span>{e.device}</span></div><small>{new Date(e.created_at).toLocaleString()}</small></div>) : <EmptyState title="No activity yet" text="Your account events will appear here after you sign in." />}</section></>; }
 function CheckItem({ label, value, good }) { return <div className="check-item" data-testid={`security-check-${label.toLowerCase().replaceAll(" ", "-")}`}><span className={good ? "check-good" : "check-warn"}>{good ? <Check size={14} /> : "!"}</span><span>{label}</span><strong>{value}</strong></div>; }
 function PasswordTester() { const [password, setPassword] = useState(""); const checks = [{ label: "12+ characters", ok: password.length >= 12 }, { label: "Uppercase letter", ok: /[A-Z]/.test(password) }, { label: "Lowercase letter", ok: /[a-z]/.test(password) }, { label: "Number", ok: /\d/.test(password) }, { label: "Special character", ok: /[^A-Za-z0-9]/.test(password) }]; const score = checks.filter((x) => x.ok).length; return <div className="password-tester"><div className="tester-input"><input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Type a password to check" data-testid="password-strength-checker-input" />{password && <span>{score >= 4 ? "Strong" : score >= 2 ? "Needs work" : "Very weak"}</span>}</div><div className="strength-checks">{checks.map((x) => <span key={x.label} className={x.ok ? "ok" : ""}><Check size={13} /> {x.label}</span>)}</div></div>; }
-function Profile() { const { user, setUser } = useAuth(); const [name, setName] = useState(user.name); const save = async () => { const r = await api.put("/profile", { name }); setUser({ ...user, ...r.data }); toast.success("Profile updated"); }; return <><PageHeader eyebrow="Your identity" title="Profile" text="Keep your personal details current across SecureFin." /><section className="panel profile-panel"><div className="profile-hero"><div className="profile-avatar large-avatar">{user.name?.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}</div><div><h2>{user.name}</h2><p>{user.email}</p><span className="verified-label"><Check size={13} /> Account verified</span></div></div><div className="profile-form"><Field label="Full name" name="profile_name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" testid="profile-name-input" /><Field label="Email address" name="profile_email" value={user.email} onChange={() => {}} placeholder="you@example.com" testid="profile-email-input" /><button className="button button-primary" onClick={save} data-testid="save-profile-button">Save profile <Check size={15} /></button></div></section></>; }
+function Profile() { const { user, setUser, signOut } = useAuth(); const navigate = useNavigate(); const [name, setName] = useState(user.name); const save = async () => { const r = await api.put("/profile", { name }); setUser({ ...user, ...r.data }); toast.success("Profile updated"); }; const doLogout = async () => { if (!window.confirm("Sign out of SecureFin?")) return; await signOut(); navigate("/"); }; return <><PageHeader eyebrow="Your identity" title="Profile" text="Keep your personal details current across SecureFin." /><section className="panel profile-panel"><div className="profile-hero"><div className="profile-avatar large-avatar">{user.name?.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}</div><div><h2>{user.name}</h2><p>{user.email}</p><span className="verified-label"><Check size={13} /> Account verified</span></div></div><div className="profile-form"><Field label="Full name" name="profile_name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" testid="profile-name-input" /><Field label="Email address" name="profile_email" value={user.email} onChange={() => {}} placeholder="you@example.com" testid="profile-email-input" /><div className="profile-actions"><button className="button button-primary" onClick={save} data-testid="save-profile-button">Save profile <Check size={15} /></button><button className="button button-danger" onClick={doLogout} data-testid="profile-logout-button"><LogOut size={15} /> Log out</button></div></div></section></>; }
 function SettingsPage() { const { user } = useAuth(); return <><PageHeader eyebrow="Workspace preferences" title="Settings" text="Tune SecureFin to the way you think about money." /><div className="settings-list"><section className="panel setting-row"><div className="setting-icon"><Sun size={18} /></div><div><h3>Appearance</h3><p>Switch between light and dark mode from the sidebar.</p></div><span className="setting-status">Available</span></section><section className="panel setting-row"><div className="setting-icon"><ShieldCheck size={18} /></div><div><h3>Account security</h3><p>{user.two_factor_enabled ? "Two-factor authentication is enabled." : "Add an authenticator challenge in Security center."}</p></div><NavLink className="button button-secondary" to="/app/security" data-testid="settings-security-link">Review security</NavLink></section><section className="panel setting-row"><div className="setting-icon"><Bell size={18} /></div><div><h3>Notifications</h3><p>Get useful reminders for budgets, renewals and sign-ins.</p></div><span className="setting-status">On</span></section></div></>; }
 function SearchResults() { const location = useLocation(); const results = location.state?.results || []; return <><PageHeader eyebrow="Global search" title="Search results" text={`Results for “${location.state?.query || ""}” across your workspace.`} /><section className="panel records-panel">{results.length ? results.map((r) => <div className="record-row" key={r.id} data-testid={`search-result-${r.id}`}><span className="record-name"><span className="record-icon"><Search size={15} /></span><span><strong>{r.description || r.name || r.category}</strong><small>{r.record_type}</small></span></span><span>{r.category || r.type || "—"}</span><span>{r.date || r.next_billing_date || "—"}</span><strong>{money(r.amount)}</strong><span /></div>) : <EmptyState title="No matching records" text="Try a different name, category or description." />}</section></>; }
 
