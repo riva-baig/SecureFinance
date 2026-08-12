@@ -457,7 +457,7 @@ async def delete_record(collection: str, record_id: str, user: Dict[str, Any] = 
 
 
 app.include_router(api_router)
-app.add_middleware(CORSMiddleware, allow_credentials=True, allow_origins=[FRONTEND_URL], allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(CORSMiddleware, allow_credentials=True, allow_origins=[FRONTEND_URL, "http://localhost:3000"], allow_origin_regex=r"https://.*\.preview\.emergentagent\.com", allow_methods=["*"], allow_headers=["*"])
 
 
 @app.on_event("startup")
