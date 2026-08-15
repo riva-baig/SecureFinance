@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, useRef, createContext, useContext } from "react";
 import { BrowserRouter, Routes, Route, NavLink, Navigate, useNavigate, useLocation, Link } from "react-router-dom";
 import axios from "axios";
-import { motion, useInView, useMotionValue, useSpring, useTransform, useScroll } from "framer-motion";
+import { motion, useInView, useMotionValue, useSpring, useTransform, useScroll, useReducedMotion } from "framer-motion";
 import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { ArrowUpRight, BarChart3, Bell, BookOpen, Check, ChevronRight, CircleDollarSign, CreditCard, Eye, EyeOff, FileText, Gift, Globe2, Home, Landmark, LayoutDashboard, LogOut, Menu, Moon, MoreHorizontal, Pencil, Plus, Receipt, Search, Settings, Shield, ShieldCheck, Sparkles, Sun, Target, Trash2, TrendingUp, UserRound, Wallet, X, LockKeyhole, Zap } from "lucide-react";
 import { Toaster, toast } from "sonner";
@@ -27,28 +27,49 @@ const Logo = ({ light = false }) => <Link to="/" className={`brand ${light ? "br
 
 function WordReveal({ text, className = "", delay = 0 }) {
   const words = text.split(" ");
+  const reduce = useReducedMotion();
+  if (reduce) return <span className={className}>{words.map((w, i) => <span key={i} className="reveal-word">{w}</span>)}</span>;
   return <span className={className}>{words.map((w, i) => <motion.span key={i} className="reveal-word" initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: delay + i * 0.08, duration: 0.7, ease: [0.2, 0.7, 0.2, 1] }}>{w}</motion.span>)}</span>;
 }
 
 function RevealOnScroll({ children, delay = 0 }) {
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true, amount: 0.2 });
-  return <motion.div ref={ref} initial={{ opacity: 0, y: 30 }} animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ delay, duration: 0.7, ease: [0.2, 0.7, 0.2, 1] }}>{children}</motion.div>;
+  const inView = useInView(ref, { once: true, amount: 0.2, margin: "0px 0px -80px 0px" });
+  const reduce = useReducedMotion();
+  const hidden = { opacity: 0, y: 30 };
+  const shown = { opacity: 1, y: 0 };
+  if (reduce) return <div ref={ref}>{children}</div>;
+  return <motion.div ref={ref} initial={hidden} animate={inView ? shown : hidden} transition={{ delay, duration: 0.7, ease: [0.2, 0.7, 0.2, 1] }}>{children}</motion.div>;
+}
+
+function InViewMotion({ as = "div", children, initial, whileInView, transition, className, style, testid, once = true, amount = 0.2 }) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once, amount, margin: "0px 0px -60px 0px" });
+  const reduce = useReducedMotion();
+  const MotionTag = motion[as] || motion.div;
+  if (reduce) {
+    const Tag = as;
+    return <Tag ref={ref} className={className} style={style} data-testid={testid}>{children}</Tag>;
+  }
+  return <MotionTag ref={ref} initial={initial} animate={inView ? whileInView : initial} transition={transition} className={className} style={style} data-testid={testid}>{children}</MotionTag>;
 }
 
 function CursorTrail() {
+  const reduce = useReducedMotion();
   const x = useMotionValue(-200); const y = useMotionValue(-200);
   const sx = useSpring(x, { stiffness: 140, damping: 22, mass: 0.6 });
   const sy = useSpring(y, { stiffness: 140, damping: 22, mass: 0.6 });
   const sx2 = useSpring(x, { stiffness: 60, damping: 18, mass: 1 });
   const sy2 = useSpring(y, { stiffness: 60, damping: 18, mass: 1 });
   useEffect(() => {
+    if (reduce) return;
     const handler = (e) => { x.set(e.clientX); y.set(e.clientY); };
     const leave = () => { x.set(-500); y.set(-500); };
     window.addEventListener("mousemove", handler);
     window.addEventListener("mouseleave", leave);
     return () => { window.removeEventListener("mousemove", handler); window.removeEventListener("mouseleave", leave); };
-  }, [x, y]);
+  }, [x, y, reduce]);
+  if (reduce) return null;
   return <>
     <motion.div className="cursor-aurora cursor-aurora-1" style={{ x: sx2, y: sy2 }} aria-hidden />
     <motion.div className="cursor-aurora cursor-aurora-2" style={{ x: sx, y: sy }} aria-hidden />
@@ -241,7 +262,12 @@ function ScrollLinkedChart() {
   </div>;
 }
 function DashboardPreview({ parallax }) {
-  return <motion.div className="preview-wrap" initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.9, ease: [0.2, 0.7, 0.2, 1] }}>
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, amount: 0.15, margin: "0px 0px -40px 0px" });
+  const reduce = useReducedMotion();
+  const enter = { opacity: 1, y: 0 };
+  const hidden = { opacity: 0, y: 40 };
+  return <motion.div ref={ref} className="preview-wrap" initial={reduce ? enter : hidden} animate={reduce || inView ? enter : hidden} transition={{ duration: 0.9, ease: [0.2, 0.7, 0.2, 1] }}>
     <div className="preview-glow" />
     <motion.div className="float-widget fw-left-top" style={{ x: parallax?.x, y: parallax?.y }} animate={{ y: [0, -8, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}>
       <div className="fw-label">Expenses Report</div>
@@ -294,7 +320,7 @@ function AuthPage() {
   const update = (e) => setForm({ ...form, [e.target.name]: e.target.value });
   const submit = async (e) => { e.preventDefault(); setBusy(true); setError(""); try { if (mode === "forgot") { const r = await api.post("/auth/forgot-password", { email: form.email }); toast.success(r.data.message); if (r.data.development_token) { setResetToken(r.data.development_token); setMode("reset"); } } else if (mode === "reset") { await api.post("/auth/reset-password", { token: resetToken || form.confirm_password, password: form.password }); toast.success("Password updated"); setMode("login"); } else if (mode === "register") { const r = await api.post("/auth/register", { ...form, demo_data: true }); setUser(r.data); navigate("/app"); } else { const r = await api.post("/auth/login", { email: form.email, password: form.password }, { params: form.two_factor_code ? { two_factor_code: form.two_factor_code } : {} }); setUser(r.data); navigate("/app"); } } catch (e) { setError(formatApiError(e.response?.data?.detail)); } finally { setBusy(false); } };
   const title = mode === "register" ? "Build your secure picture." : mode === "forgot" ? "Reset your access." : mode === "reset" ? "Choose a new password." : "Welcome back.";
-  return <div className="auth-page"><CursorTrail /><div className="auth-aside"><Logo light /><div className="auth-aside-copy"><div className="eyebrow eyebrow-light"><span className="eyebrow-dot" /> Security, without the friction</div><h1>{title}</h1><p>Take control of your finances without compromising your digital security.</p></div><div className="auth-aside-bottom"><span><ShieldCheck size={16} /> Protected workspace</span><span>SecureFin / 2026</span></div></div><div className="auth-main"><div className="mobile-auth-logo"><Logo /></div><div className="auth-card"><div className="auth-card-head"><div className="eyebrow">Private by design</div><h2>{mode === "register" ? "Create your account" : mode === "forgot" ? "Forgot password?" : mode === "reset" ? "Reset password" : "Sign in to SecureFin"}</h2><p>{mode === "register" ? "Start with a secure financial workspace." : mode === "forgot" ? "We’ll prepare a secure reset link for your account." : mode === "reset" ? "Use a new password you’ll remember." : "Your financial command center is waiting."}</p></div>{error && <div className="form-error" data-testid="auth-error"><X size={16} /> {error}</div>}<form onSubmit={submit} data-testid={`${mode}-form`}>{mode === "register" && <Field label="Full name" name="name" value={form.name} onChange={update} placeholder="Aarav Mehta" testid="register-name-input" />}{mode !== "reset" && <Field label="Email address" name="email" type="email" value={form.email} onChange={update} placeholder="you@example.com" testid={`${mode}-email-input`} />}{mode !== "forgot" && <><Field label="Password" name="password" type={showPassword ? "text" : "password"} value={form.password} onChange={update} placeholder="At least 8 characters" testid={`${mode}-password-input`} suffix={<button type="button" className="input-icon" onClick={() => setShowPassword(!showPassword)} data-testid="toggle-password-visibility">{showPassword ? <EyeOff size={17} /> : <Eye size={17} />}</button>} />{mode === "register" && <PasswordMeter score={score} />}</>}{mode === "register" && <Field label="Confirm password" name="confirm_password" type="password" value={form.confirm_password} onChange={update} placeholder="Repeat your password" testid="register-confirm-password-input" />}{mode === "login" && <div className="auth-options"><label className="checkbox-label"><input type="checkbox" data-testid="remember-me-checkbox" /> <span>Remember me</span></label><button type="button" className="link-button" onClick={() => { setMode("forgot"); setError(""); }} data-testid="forgot-password-link">Forgot password?</button></div>}{mode === "login" && error.includes("Two-factor") && <Field label="Authenticator code" name="two_factor_code" value={form.two_factor_code} onChange={update} placeholder="123456" testid="two-factor-code-input" />}{mode === "reset" && <Field label="Reset token" name="confirm_password" value={resetToken || form.confirm_password} onChange={(e) => { setResetToken(e.target.value); update(e); }} placeholder="Paste development reset token" testid="reset-token-input" />}{mode === "register" && <label className="terms"><input type="checkbox" required data-testid="terms-checkbox" /> <span>I agree to SecureFin’s terms and privacy principles</span></label>}<button className="button button-primary full-width" disabled={busy} data-testid={`${mode}-submit-button`}>{busy ? "Working…" : mode === "register" ? "Create secure account" : mode === "forgot" ? "Prepare reset link" : mode === "reset" ? "Update password" : "Sign in"} <ArrowUpRight size={16} /></button></form><div className="auth-switch">{mode === "forgot" || mode === "reset" ? <button className="link-button" onClick={() => setMode("login")} data-testid="back-to-login-link">← Back to sign in</button> : <>{mode === "register" ? "Already have an account?" : "New to SecureFin?"} <button className="link-button" onClick={() => setMode(mode === "register" ? "login" : "register")} data-testid="auth-mode-toggle">{mode === "register" ? "Sign in" : "Create an account"}</button></>}</div></div></div></div>;
+  return <div className="auth-page"><CursorTrail /><div className="auth-aside"><Logo light /><div className="auth-aside-copy"><div className="eyebrow eyebrow-light"><span className="eyebrow-dot" /> Security, without the friction</div><h1>{title}</h1><p>Take control of your finances without compromising your digital security.</p></div><div className="auth-aside-bottom"><span><ShieldCheck size={16} /> Protected workspace</span><span>SecureFin / 2026</span></div></div><div className="auth-main"><div className="mobile-auth-logo"><Logo /></div><div className="auth-card"><div className="auth-card-head"><div className="eyebrow">Private by design</div><h2>{mode === "register" ? "Create your account" : mode === "forgot" ? "Forgot password?" : mode === "reset" ? "Reset password" : "Sign in to SecureFin"}</h2><p>{mode === "register" ? "Start with a secure financial workspace." : mode === "forgot" ? "We’ll prepare a secure reset link for your account." : mode === "reset" ? "Use a new password you’ll remember." : "Your financial command center is waiting."}</p></div>{error && <div className="form-error" data-testid="auth-error"><X size={16} /> {error}</div>}<form onSubmit={submit} data-testid={`${mode}-form`}>{mode === "register" && <Field label="Full name" name="name" value={form.name} onChange={update} placeholder="Aarav Mehta" testid="register-name-input" />}{mode !== "reset" && <Field label="Email address" name="email" type="email" value={form.email} onChange={update} placeholder="you@example.com" testid={`${mode}-email-input`} />}{mode !== "forgot" && <><Field label="Password" name="password" type={showPassword ? "text" : "password"} value={form.password} onChange={update} placeholder="At least 8 characters" testid={`${mode}-password-input`} suffix={<button type="button" className="input-icon" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? "Hide password" : "Show password"} data-testid="toggle-password-visibility">{showPassword ? <Eye size={17} /> : <EyeOff size={17} />}</button>} />{mode === "register" && <PasswordMeter score={score} />}</>}{mode === "register" && <Field label="Confirm password" name="confirm_password" type="password" value={form.confirm_password} onChange={update} placeholder="Repeat your password" testid="register-confirm-password-input" />}{mode === "login" && <div className="auth-options"><label className="checkbox-label"><input type="checkbox" data-testid="remember-me-checkbox" /> <span>Remember me</span></label><button type="button" className="link-button" onClick={() => { setMode("forgot"); setError(""); }} data-testid="forgot-password-link">Forgot password?</button></div>}{mode === "login" && error.includes("Two-factor") && <Field label="Authenticator code" name="two_factor_code" value={form.two_factor_code} onChange={update} placeholder="123456" testid="two-factor-code-input" />}{mode === "reset" && <Field label="Reset token" name="confirm_password" value={resetToken || form.confirm_password} onChange={(e) => { setResetToken(e.target.value); update(e); }} placeholder="Paste development reset token" testid="reset-token-input" />}{mode === "register" && <label className="terms"><input type="checkbox" required data-testid="terms-checkbox" /> <span>I agree to SecureFin’s terms and privacy principles</span></label>}<button className="button button-primary full-width" disabled={busy} data-testid={`${mode}-submit-button`}>{busy ? "Working…" : mode === "register" ? "Create secure account" : mode === "forgot" ? "Prepare reset link" : mode === "reset" ? "Update password" : "Sign in"} <ArrowUpRight size={16} /></button></form><div className="auth-switch">{mode === "forgot" || mode === "reset" ? <button className="link-button" onClick={() => setMode("login")} data-testid="back-to-login-link">← Back to sign in</button> : <>{mode === "register" ? "Already have an account?" : "New to SecureFin?"} <button className="link-button" onClick={() => setMode(mode === "register" ? "login" : "register")} data-testid="auth-mode-toggle">{mode === "register" ? "Sign in" : "Create an account"}</button></>}</div></div></div></div>;
 }
 
 function Field({ label, name, type = "text", value, onChange, placeholder, suffix, testid }) { return <label className="field"><span>{label}</span><div className="input-wrap"><input required name={name} type={type} value={value} onChange={onChange} placeholder={placeholder} data-testid={testid} />{suffix}</div></label>; }

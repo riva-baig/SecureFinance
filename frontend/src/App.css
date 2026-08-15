@@ -1342,6 +1342,17 @@ body.light .app-shell::before { opacity: 0.5; }
 @keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(12px); } to { opacity: 1; transform: none; } }
 @keyframes shimmer { from { background-position: -200% 0; } to { background-position: 200% 0; } }
 
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .hero-orb, .float-widget, .security-orbit, .eyebrow-dot, .cursor-aurora { animation: none !important; }
+  .reveal-up { opacity: 1 !important; transform: none !important; }
+}
+
 /* Section reveal */
 .reveal-up { opacity: 0; transform: translateY(30px); transition: opacity .8s cubic-bezier(.2,.7,.2,1), transform .8s cubic-bezier(.2,.7,.2,1); }
 .reveal-up.in-view { opacity: 1; transform: none; }
