@@ -1,28 +1,30 @@
 @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
-  --bg: #060309;
-  --bg-soft: #0b0616;
-  --panel: #0f0a1e;
+  --bg: #05040f;
+  --bg-soft: #0a0820;
+  --panel: #100c22;
   --panel-2: #14102a;
   --panel-glass: rgba(24, 18, 48, 0.55);
   --line: rgba(184, 154, 255, 0.10);
-  --line-strong: rgba(184, 154, 255, 0.20);
+  --line-strong: rgba(184, 154, 255, 0.22);
   --ink: #ede7fb;
-  --ink-soft: #a89dc4;
-  --ink-muted: #6e6488;
+  --ink-soft: #b0a4d0;
+  --ink-muted: #726788;
   --violet: #9366ff;
   --violet-2: #b892ff;
   --violet-deep: #5b2be0;
   --violet-glow: rgba(147, 102, 255, 0.55);
   --cyan: #7cc5ff;
   --magenta: #d16bff;
+  --pink: #ff7ac0;
   --teal: #38d4c4;
   --green: #6cf1a4;
   --red: #ff7a8c;
-  --amber: #ffc266;
-  --shadow-lg: 0 30px 80px rgba(70, 30, 200, 0.35);
-  --shadow-md: 0 14px 40px rgba(70, 30, 200, 0.22);
+  --amber: #ffb56b;
+  --gold: #ffd27a;
+  --shadow-lg: 0 30px 80px rgba(30, 12, 70, 0.55);
+  --shadow-md: 0 14px 40px rgba(30, 12, 70, 0.30);
 }
 
 * { box-sizing: border-box; }
@@ -54,9 +56,7 @@ em { font-family: 'Instrument Serif', 'Playfair Display', serif; font-style: ita
   content: "";
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(1200px 600px at 50% -10%, rgba(147, 102, 255, 0.18), transparent 60%),
-    radial-gradient(800px 500px at 100% 100%, rgba(120, 200, 255, 0.12), transparent 60%);
+  background: none;
   pointer-events: none;
   z-index: 0;
 }
@@ -1119,10 +1119,7 @@ em { font-family: 'Instrument Serif', 'Playfair Display', serif; font-style: ita
 
 /* Landing::before layered aurora glows */
 .landing-page::before {
-  background:
-    radial-gradient(1200px 600px at 50% -10%, rgba(147, 102, 255, 0.18), transparent 60%),
-    radial-gradient(900px 500px at 100% 100%, rgba(124, 197, 255, 0.14), transparent 60%),
-    radial-gradient(800px 450px at 0% 80%, rgba(209, 107, 255, 0.10), transparent 60%);
+  background: none;
 }
 
 /* Aurora CTA button — multi-hue gradient */
@@ -1201,6 +1198,152 @@ em { font-family: 'Instrument Serif', 'Playfair Display', serif; font-style: ita
 .cat-1 { background: var(--cyan); }
 .cat-2 { background: var(--magenta); }
 .cat-3 { background: var(--amber); }
+/* ---------- CINEMATIC HERO (city sunset) ---------- */
+.hero-city {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  right: auto;
+  width: 100vw;
+  transform: translateX(-50%);
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.hero-city-img {
+  position: absolute;
+  inset: -8% -4%;
+  background-image: url("https://customer-assets-39nsmqrw.emergentagent.net/job_money-vault-89/artifacts/kw7qbu1a_ChatGPT%20Image%20Aug%2015%2C%202026%2C%2002_24_07%20PM.png");
+  background-size: cover;
+  background-position: center 55%;
+  background-repeat: no-repeat;
+  transform-origin: center 50%;
+  will-change: transform, filter;
+  animation: heroKenBurns 26s ease-in-out infinite alternate;
+  filter: saturate(1.08) brightness(0.85) contrast(1.05);
+}
+.hero-city-veil {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(5, 4, 15, 0.55) 0%, rgba(5, 4, 15, 0.35) 40%, rgba(5, 4, 15, 0.75) 90%, #05040f 100%),
+    radial-gradient(1200px 700px at 50% 5%, rgba(255, 122, 192, 0.15), transparent 55%),
+    radial-gradient(900px 500px at 12% 90%, rgba(255, 181, 107, 0.10), transparent 60%),
+    linear-gradient(180deg, rgba(15, 8, 36, 0.5) 0%, transparent 30%);
+  mix-blend-mode: normal;
+}
+@keyframes heroKenBurns {
+  0% { transform: scale(1.06) translate3d(-1%, -0.5%, 0); filter: saturate(1.05) brightness(0.88); }
+  100% { transform: scale(1.14) translate3d(1%, 1%, 0); filter: saturate(1.10) brightness(0.94); }
+}
+.hero-section .hero-copy { position: relative; z-index: 3; }
+.hero-section { padding-top: 80px; padding-bottom: 120px; }
+.hero-copy h1 {
+  background: linear-gradient(180deg, #ffffff 0%, #f4e7ff 55%, #d8bfff 100%);
+  -webkit-background-clip: text; background-clip: text;
+  text-shadow: 0 6px 40px rgba(0, 0, 0, 0.35);
+}
+.hero-copy h1 em { background: linear-gradient(120deg, #ffd27a 0%, #ff7ac0 45%, #b892ff 100%); -webkit-background-clip: text; background-clip: text; }
+.hero-copy > p { color: #cfc2e8; text-shadow: 0 3px 20px rgba(0, 0, 0, 0.45); }
+.hero-copy .eyebrow { background: rgba(255, 122, 192, 0.10); border-color: rgba(255, 122, 192, 0.35); color: #ffb2df; }
+.hero-copy .eyebrow-dot { background: #ffb2df; box-shadow: 0 0 12px #ffb2df, 0 0 0 4px rgba(255, 122, 192, 0.18); }
+
+/* Nav — transparent → glass on scroll */
+.landing-nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  transition: background .35s ease, border-color .35s ease, backdrop-filter .35s ease, box-shadow .35s ease, height .35s ease;
+  background: transparent;
+  border-bottom: 1px solid transparent;
+}
+.landing-nav.is-scrolled {
+  background: rgba(10, 8, 30, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom-color: var(--line);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  height: 72px;
+}
+
+/* Aurora primary button — warm sunset gradient variant for cinematic hero */
+.button-primary {
+  background: linear-gradient(120deg, #6a37ec 0%, #b06bff 40%, #ff7ac0 78%, #ffb56b 100%);
+  background-size: 200% 100%;
+  background-position: 0% 50%;
+  box-shadow: 0 12px 34px rgba(180, 60, 180, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+.button-primary:hover { background-position: 100% 50%; box-shadow: 0 16px 42px rgba(200, 80, 180, 0.45); }
+
+/* Trust strip on cinematic dark bg */
+.trust-strip { background: linear-gradient(180deg, rgba(15, 10, 30, 0.4), rgba(15, 10, 30, 0.8)); border-color: var(--line); }
+
+/* Feature card — warm amber highlight on hover */
+.feature-card:hover .feature-icon {
+  background: linear-gradient(135deg, rgba(255, 181, 107, 0.18), rgba(255, 122, 192, 0.14));
+  color: #ffd8a8;
+  border-color: rgba(255, 181, 107, 0.30);
+}
+.feature-card:hover h3 { color: #ffe7c8; }
+
+/* CTA section — swap purple wash for warm sunset wash */
+.cta-section {
+  background:
+    linear-gradient(180deg, rgba(255, 122, 192, 0.06), rgba(255, 181, 107, 0.06)),
+    linear-gradient(180deg, rgba(147, 102, 255, 0.10), rgba(91, 43, 224, 0.14));
+}
+.cta-section::before {
+  background: radial-gradient(ellipse, rgba(255, 122, 192, 0.30), rgba(147, 102, 255, 0.20) 45%, transparent 70%);
+}
+
+/* ---------- AUTH — animated light blobs behind form ---------- */
+.auth-orbs {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.auth-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.55;
+  will-change: transform;
+}
+.auth-orb-1 {
+  width: 520px; height: 520px;
+  background: radial-gradient(circle, rgba(147, 102, 255, 0.55), transparent 65%);
+  top: -10%; left: -6%;
+  animation: authDrift1 22s ease-in-out infinite alternate;
+}
+.auth-orb-2 {
+  width: 460px; height: 460px;
+  background: radial-gradient(circle, rgba(255, 122, 192, 0.45), transparent 65%);
+  bottom: -12%; right: -8%;
+  animation: authDrift2 26s ease-in-out infinite alternate;
+}
+.auth-orb-3 {
+  width: 380px; height: 380px;
+  background: radial-gradient(circle, rgba(124, 197, 255, 0.35), transparent 65%);
+  top: 40%; left: 45%;
+  animation: authDrift3 30s ease-in-out infinite alternate;
+}
+@keyframes authDrift1 { from { transform: translate(0, 0) scale(1); } to { transform: translate(60px, 40px) scale(1.12); } }
+@keyframes authDrift2 { from { transform: translate(0, 0) scale(1.05); } to { transform: translate(-70px, -30px) scale(0.95); } }
+@keyframes authDrift3 { from { transform: translate(-40px, 0) scale(1); } to { transform: translate(50px, -50px) scale(1.15); } }
+.auth-page { position: relative; }
+.auth-page > .auth-aside, .auth-page > .auth-main, .auth-page > .cursor-aurora { position: relative; z-index: 2; }
+
+/* ---------- DASHBOARD — warm amber accents where the palette calls for them ---------- */
+.stat-orange .stat-icon { background: rgba(255, 181, 107, 0.12); color: var(--amber); border-color: rgba(255, 181, 107, 0.28); }
+.stat-orange::before { background: linear-gradient(180deg, var(--amber), var(--pink)); }
+.stat-card .positive { color: var(--gold); }
+.demo-banner { background: linear-gradient(155deg, rgba(255, 122, 192, 0.10), rgba(147, 102, 255, 0.06)); border-color: rgba(255, 122, 192, 0.22); }
+.demo-banner svg, .demo-banner button { color: var(--pink); }
+.security-pill { color: var(--gold); background: rgba(255, 210, 122, 0.10); border-color: rgba(255, 210, 122, 0.25); }
+
 .legend-teal { background: var(--violet-2); }
 .legend-orange { background: var(--cyan); }
 
