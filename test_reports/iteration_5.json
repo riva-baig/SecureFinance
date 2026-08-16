@@ -1,0 +1,36 @@
+{
+  "summary": "Iteration 5: Verified dark cinematic auth redesign + horizontal Shanghai hero + dashboard theme toggle. Backend regression PASS (2/2 pytest, all critical auth+CRUD+2FA+forgot/reset flows). Frontend PASS on all 15 review-request bullets: hero uses cb3hdfee_hori.png with cover + Ken Burns, auth aside 58% (835px @1440) at x=0/y=0 with h5p5wtvy_SecureFin_cityscape_4K.webp on ::before, auth main 42% at x~835/y=0, cinematic entrance animations (authImageIn/authImageDrift/authOverlayIn/authMainIn/authCardIn/authCopyIn) all present, admin login → /app OK, registration path OK via backend test, eye toggle correct convention (EyeOff when type=password → Eye when type=text), forgot-password link visible/clickable in dark card, theme toggle applies body.light + persists in localStorage 'securefin-theme' across reload, light mode contrast readable (stat-card #1a1235 on #fff, sidebar 0.75 white, H1 dark ink), dark accents intact, 9 sidebar routes navigate in both themes, mobile 375 stacks with no horizontal overflow, prefers-reduced-motion collapses image/overlay/main/card animations. No console JS errors (only expected 401 on /api/auth/me for unauthenticated landing).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "tests_executed": {
+    "backend_pytest": "2/2 PASS in 2.77s (test_securefin_critical_api_flow + test_unauthenticated_protection_and_invalid_resource)",
+    "hero_horizontal": "PASS - .hero-city-img backgroundImage contains cb3hdfee_hori.png, background-size:cover, animation-name:heroKenBurns, .hero-city-veil present",
+    "auth_layout_58_42": "PASS @1440px - aside {x:0.02, y:0, w:835.19 (58.0%), h:900}; main {x:835.33, y:0, w:604.80 (42.0%), h:900} — no 480px top gap",
+    "auth_cityscape_image": "PASS - .auth-aside::before backgroundImage contains h5p5wtvy_SecureFin_cityscape_4K.webp",
+    "cinematic_animations": "PASS - ::before animation-name='authImageIn, authImageDrift'; ::after 'authOverlayIn'; .auth-main 'authMainIn'; .auth-card 'authCardIn'; .auth-card-head 'authCopyIn'. Final state opacity=1 / transform=none as expected",
+    "login_flow": "PASS - admin@securefin.app / SecureFinAdmin!2026 → /app. data-testid='login-submit-button' works",
+    "password_eye_toggle": "PASS - type=password renders .lucide-eye-off; click .auth-password-toggle (data-testid=toggle-password-visibility) → type=text renders .lucide-eye (no eye-off)",
+    "forgot_password": "PASS - data-testid='forgot-password-link' button present and clickable on dark card",
+    "theme_toggle": "PASS - default body className has no 'light' + ls='dark'; click theme-toggle → body.light + ls='light'; reload keeps 'light'; click again → 'dark'",
+    "light_mode_contrast": "PASS - stat-card text rgb(26,18,53) on rgb(255,255,255); sidebar text rgb(26,18,53) on rgba(255,255,255,0.75); H1 rgb(26,18,53) — high contrast",
+    "sidebar_9_routes_dark": "PASS - /app (Good evening), /app/transactions, /app/investments, /app/subscriptions, /app/budgets, /app/analytics, /app/security, /app/profile, /app/settings all render correct H1",
+    "sidebar_routes_light": "PASS - same routes render correctly in light mode",
+    "responsive_375": "PASS - aside/main stack vertically, documentElement.scrollWidth == window.innerWidth (no horizontal overflow)",
+    "reduced_motion": "PASS - all auth entrance animations respect prefers-reduced-motion:reduce (global *,*::before,*::after 0.001ms rule applies)",
+    "console_errors": "PASS - only benign /api/auth/me 401 on unauth pages; no JS exceptions"
+  },
+  "test_report_links": ["/app/backend/tests/test_securefin.py", "/app/test_reports/pytest/iteration_5.xml"],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Auth cinematic layer stack looks correct — ::before (image + drift), ::after (overlay gradient), > * (z-index:2) for content. Nicely done.",
+    "Note (already flagged in iter 4): App.js still monolithic; not a regression but worth modularising when time permits.",
+    "Small nit: sidebar visually shows 7 top-level nav items; Profile/Settings appear to be reached via avatar/menu — routes exist and render but not directly in sidebar. Matches previous iterations, not a new regression."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "admin@securefin.app / SecureFinAdmin!2026 (verified)",
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "All three requested changes verified live at https://money-vault-89.preview.emergentagent.com : (1) landing hero uses horizontal cb3hdfee_hori.png; (2) /auth is dark cinematic 58/42 split with h5p5wtvy_SecureFin_cityscape_4K.webp on aside ::before + 5 staggered entrance keyframes; (3) sidebar data-testid='theme-toggle' swaps body.light class and persists in localStorage 'securefin-theme'. Backend endpoints unchanged and green. No action required."
+}
